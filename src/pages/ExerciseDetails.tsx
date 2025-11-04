@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Exercise } from "../interfaces/Exercise";
 import { useParams } from "react-router";
+import { Button } from "flowbite-react";
 
 export default function ExerciseDetails() {
     const [exercise, setExercise] = useState<Exercise | null>(null);
@@ -61,7 +62,7 @@ export default function ExerciseDetails() {
                     ))}
 
                     <div>
-                        <button className="btn">Submit Answers</button>
+                        <Button className="btn btn-primary">Submit Answers</Button>
                     </div>
                 </div>
             </main>

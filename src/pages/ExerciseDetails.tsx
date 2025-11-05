@@ -3,9 +3,14 @@ import type { Exercise } from "../interfaces/Exercise";
 import { useParams } from "react-router";
 import { Button } from "flowbite-react";
 
+
+interface IAnswer {
+    questionId: string;
+    value: string;
+}
 export default function ExerciseDetails() {
     const [exercise, setExercise] = useState<Exercise | null>(null);
-    const [answers, setAnswers] = useState<Record<string, string>>({});
+    const [answers, setAnswers] = useState<IAnswer[]>([]);
     const { id } = useParams<{ id: string }>();
 
     useEffect(() => {
@@ -13,10 +18,32 @@ export default function ExerciseDetails() {
             .then(res => res.json())
             .then(data => setExercise(data));
     }, []);
-
-    const handleSelectOption = (questionId: string, option: string) => {
-        setAnswers(prev => ({ ...prev, [questionId]: option }));
+    const handleSelectOption = (questionId: string, value: string) => {
+        setAnswers(prevAnswers => {
+            const existingAnswerIndex = prevAnswers.findIndex(a => a.questionId === questionId);
+            if (existingAnswerIndex > -1) {
+                // Update existing answer
+                const updatedAnswers = [...prevAnswers];
+                updatedAnswers[existingAnswerIndex] = { questionId, value };
+                return updatedAnswers;
+            } else {
+                // Add new answer
+                return [...prevAnswers, { questionId, value }];
+            }
+        });
     };
+
+    const submit = () => {
+        fetch(`http://localhost:8080/exercises/${id}/answer`, {
+            body: JSON.stringify(answers),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => setExercise(data));
+    }
 
     return (
         <div className="max-w-4xl mx-auto p-6 font-sans">
@@ -36,19 +63,24 @@ export default function ExerciseDetails() {
 
                             {question.type === 'MULTIPLE_CHOICE' ? (
                                 <div className="space-y-2">
-                                    {question.options.map(option => (
-                                        <label key={option} className="flex items-center space-x-2 cursor-pointer">
-                                            <input
-                                                type="radio"
-                                                name={question.id}
-                                                value={option}
-                                                checked={answers[question.id] === option}
-                                                onChange={() => handleSelectOption(question.id, option)}
-                                                className="accent-blue-500"
-                                            />
-                                            <span>{option}</span>
-                                        </label>
-                                    ))}
+                                    {question.options.map(option => {
+                                        const inputId = `${question.id}-${option}`;
+                                        const checked = answers.find(a => a.questionId === question.id)?.value === option;
+                                        return (
+                                            <label key={inputId} htmlFor={inputId} className="flex items-center space-x-2 cursor-pointer">
+                                                <input
+                                                    id={inputId}
+                                                    type="radio"
+                                                    name={question.id}
+                                                    value={option}
+                                                    checked={checked}
+                                                    onChange={() => handleSelectOption(question.id, option)}
+                                                    className="accent-blue-500"
+                                                />
+                                                <span>{option}</span>
+                                            </label>
+                                        );
+                                    })}
                                 </div>
                             ) : (
                                 <textarea
@@ -62,7 +94,7 @@ export default function ExerciseDetails() {
                     ))}
 
                     <div>
-                        <Button className="btn btn-primary">Submit Answers</Button>
+                        <Button className="btn btn-primary" onClick={submit}>Submit Answers</Button>
                     </div>
                 </div>
             </main>

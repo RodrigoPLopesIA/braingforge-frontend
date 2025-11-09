@@ -7,6 +7,7 @@ import ExerciseList from './pages/ExerciseList';
 import ExerciseDetails from './pages/ExerciseDetails';
 import { Link } from 'react-router';
 import AnsweredExercises from './pages/AnsweredExercises';
+import AnsweredExercise from './pages/AnsweredExercise';
 
 function App() {
 
@@ -24,7 +25,8 @@ function App() {
           <Route path="/exercises" element={<ExerciseList />} />
           <Route path="/create" element={<ExerciseCreate />} />
           <Route path="/exercise/:id" element={<ExerciseDetails />} />
-          <Route path="/answered-exercises/:exerciseId" element={<AnsweredExercises />} />
+          <Route path="/exercises/:exerciseId/answered" element={<AnsweredExercises />} />
+          <Route path="/exercises/:exerciseId/answered/:answeredExerciseId" element={<AnsweredExercise />} />
           <Route path="*" element={<p>Page Not Found</p>} />
         </Routes>
       </div>

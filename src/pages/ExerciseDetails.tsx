@@ -49,7 +49,7 @@ export default function ExerciseDetails() {
             .then(res => res.json())
             .then(data => setExercise(data));
 
-            navigate(`/answered-exercises/${id}`);
+            navigate(`/exercises/${id}/answered`);
 
         
     }

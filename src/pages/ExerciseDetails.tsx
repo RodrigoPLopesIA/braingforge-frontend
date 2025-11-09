@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Exercise } from "../interfaces/Exercise";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Button } from "flowbite-react";
 
 
@@ -12,6 +12,9 @@ export default function ExerciseDetails() {
     const [exercise, setExercise] = useState<Exercise | null>(null);
     const [answers, setAnswers] = useState<IAnswer[]>([]);
     const { id } = useParams<{ id: string }>();
+
+    const navigate = useNavigate();
+
 
     useEffect(() => {
         fetch(`http://localhost:8080/exercises/${id}`)
@@ -31,6 +34,8 @@ export default function ExerciseDetails() {
                 return [...prevAnswers, { questionId, value }];
             }
         });
+
+        
     };
 
     const submit = () => {
@@ -43,6 +48,10 @@ export default function ExerciseDetails() {
         })
             .then(res => res.json())
             .then(data => setExercise(data));
+
+            navigate(`/answered-exercises/${id}`);
+
+        
     }
 
     return (
@@ -85,6 +94,8 @@ export default function ExerciseDetails() {
                             ) : (
                                 <textarea
                                     id={question.id}
+                                    value={answers.find(a => a.questionId === question.id)?.value || ''}
+                                    onChange={(e) => handleSelectOption(question.id, e.target.value)}
                                     placeholder="Write your answer here..."
                                     className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
                                     rows={4}

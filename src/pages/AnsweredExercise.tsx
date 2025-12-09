@@ -2,29 +2,30 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { Button } from "flowbite-react";
 
-interface QuestionResult {
-  id: string;
-  statement: string;
-  options: string[] | null;
-  correctAnswer: string;
-  userAnswer: string;
-  isCorrect: boolean;
-  score: number;
-  explanation: string;
+export interface UserQuestion {
+    id: string;
+    statement: string;
+    options: string[] | null;
+    correctAnswer: string;
+    userAnswer: string;
+    isCorrect: boolean;
+    score: number;
+    explanation: string;
 }
 
-interface ExerciseResult {
-  id: string;
-  exerciseId: string;
-  title: string;
-  totalScore: number;
-  userScore: number;
-  questions: QuestionResult[];
-  createdAt: string;
+export interface UserExercise {
+    id: string;
+    exerciseId: string;
+    title: string;
+    totalScore: number;
+    userScore: number;
+    questions: UserQuestion[];
+    createdAt: string;
 }
+
 
 export default function AnsweredExercise() {
-  const [exercise, setExercise] = useState<ExerciseResult | null>(null);
+  const [exercise, setExercise] = useState<UserExercise | null>(null);
   const { exerciseId, answeredExerciseId } = useParams<{
     exerciseId: string;
     answeredExerciseId: string;
@@ -69,12 +70,12 @@ export default function AnsweredExercise() {
               </h3>
 
               {/* Questões de múltipla escolha */}
-              {q.options ? (
+              {q.options?.length > 0 ? (
                 <div className="space-y-2 mb-3">
                   {q.options.map((option) => {
-                    const inputId = `${q.id}-${option}`;
-                    const isUserAnswer = option === q.userAnswer;
-                    const isCorrect = option === q.correctAnswer;
+                    let inputId = `${q.id}-${option}`;
+                    let isUserAnswer = option === q.userAnswer;
+                    let isCorrect = option === q.correctAnswer;
 
                     const color =
                       isCorrect

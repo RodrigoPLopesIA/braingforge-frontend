@@ -1,14 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
+export interface ScienceQuestion {
+    id: string;
+    statement: string;
+    options: string[] | null;
+    correctAnswer: string;
+    userAnswer: string;
+    isCorrect: boolean;
+    score: number;
+    explanation: string;
+}
+
+export interface ScienceExercise {
+    id: string;
+    exerciseId: string;
+    title: string;
+    totalScore: number;
+    userScore: number;
+    questions: ScienceQuestion[];
+    createdAt: string;
+}
+
+export interface Sort {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+}
+
+export interface Pageable {
+    pageNumber: number;
+    pageSize: number;
+    sort: Sort;
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+}
+
+export interface PagedScienceExercises {
+    content: ScienceExercise[];
+    pageable: Pageable;
+    totalPages: number;
+    totalElements: number;
+    last: boolean;
+    size: number;
+    number: number;
+    sort: Sort;
+    first: boolean;
+    numberOfElements: number;
+    empty: boolean;
+}
 
 export default function ExerciseList() {
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<PagedScienceExercises>();
   const [expanded, setExpanded] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const { exerciseId } = useParams <{ exerciseId: string }>();
-
+  const navigation = useNavigate();
   useEffect(() => {
     const fetchResults = async () => {
       try {
@@ -36,10 +85,10 @@ export default function ExerciseList() {
     <div style={{ padding: "20px", fontFamily: "Arial" }}>
       <h2>Exercícios Respondidos</h2>
 
-      {results.length === 0 ? (
+      {results?.content.length === 0 ? (
         <p>Nenhum exercício respondido encontrado.</p>
       ) : (
-        results.map((exercise) => (
+        results?.content.map((exercise) => (
           <div
             key={exercise.exerciseId}
             style={{
@@ -77,6 +126,7 @@ export default function ExerciseList() {
                   ? "Clique para ocultar respostas ▲"
                   : "Clique para ver respostas ▼"}
               </p>
+              <button onClick={() =>  navigation(`/exercises/${exercise.exerciseId}/answered/${exercise.id}`)}>Details</button>
             </div>
 
             {expanded === exercise.exerciseId && (
